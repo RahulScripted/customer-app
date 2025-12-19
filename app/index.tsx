@@ -1,5 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Text, View } from "react-native";
+import Animated, { 
+  useSharedValue, 
+  useAnimatedStyle, 
+  withTiming, 
+  FadeIn, 
+  FadeOut 
+} from 'react-native-reanimated';
 import TabNavigation from "./components/TabNavigation";
 import "./global.css";
 import DemoVideos from "./pages/demo_videos";
@@ -16,6 +23,25 @@ import Payment from "./pages/repayment";
 export default function Index() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
+  const pageOpacity = useSharedValue(1);
+  const pageTranslateX = useSharedValue(0);
+
+  const pageAnimatedStyle = useAnimatedStyle(() => ({
+    opacity: pageOpacity.value,
+    transform: [{ translateX: pageTranslateX.value }]
+  }));
+
+  const handleTabChange = (newTab: string) => {
+    if (newTab !== activeTab) {
+      pageOpacity.value = withTiming(0, { duration: 150 }, () => {
+        pageOpacity.value = withTiming(1, { duration: 150 });
+      });
+      pageTranslateX.value = withTiming(20, { duration: 150 }, () => {
+        pageTranslateX.value = withTiming(0, { duration: 150 });
+      });
+      setActiveTab(newTab);
+    }
+  };
 
   const renderPage = () => {
     switch (activeTab) {
@@ -45,16 +71,27 @@ export default function Index() {
   };
 
   if (!isLoggedIn) {
-    return <LogInPage />;
+    return (
+      <Animated.View 
+        entering={FadeIn.duration(300)} 
+        exiting={FadeOut.duration(300)}
+        className="flex-1"
+      >
+        <LogInPage />
+      </Animated.View>
+    );
   }
 
   return (
     <View className="flex-1">
       <Header setIsLoggedIn={setIsLoggedIn} />
-      <View className="flex-1 pt-16">
+      <Animated.View 
+        className="flex-1 pt-20"
+        style={pageAnimatedStyle}
+      >
         {renderPage()}
-      </View>
-      <TabNavigation activeTab={activeTab} onTabChange={setActiveTab} />
+      </Animated.View>
+      <TabNavigation activeTab={activeTab} onTabChange={handleTabChange} />
     </View>
   );
 }
