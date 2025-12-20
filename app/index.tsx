@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { Text, View } from "react-native";
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withTiming, 
-  FadeIn, 
-  FadeOut 
+import { useState } from "react";
+import { View } from "react-native";
+import Animated, {
+  FadeIn,
+  FadeOut,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming
 } from 'react-native-reanimated';
-import TabNavigation from "./components/TabNavigation";
+import TabNavigation from "./components/tabs/TabNavigation";
 import "./global.css";
 import DemoVideos from "./pages/demo_videos";
 import Documents from "./pages/documents";
@@ -63,8 +63,6 @@ export default function Index() {
         return <DemoVideos />;
       case 'help_support':
         return <Support />;
-      case 'help':
-        return <View className="flex-1 justify-center items-center"><Text className="text-lg">Help</Text></View>;
       default:
         return <Home />;
     }
